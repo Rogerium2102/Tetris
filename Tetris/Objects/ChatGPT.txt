@@ -1,0 +1,93 @@
+public Rectangle[] calcBoundingRectangles()
+{
+    List<Vector2> positions = squares.Select(s => s.getPosition()).ToList();
+    List<Rectangle> boundingRects = new List<Rectangle>();
+    HashSet<Vector2> visited = new HashSet<Vector2>();
+
+    int size = Square.length;
+
+    // Grid directions (up, down, left, right)
+    Vector2[] directions = new Vector2[]
+    {
+        new Vector2(0, -size),
+        new Vector2(0, size),
+        new Vector2(-size, 0),
+        new Vector2(size, 0)
+    };
+
+    foreach (var pos in positions)
+    {
+        if (visited.Contains(pos)) continue;
+
+        Queue<Vector2> queue = new Queue<Vector2>();
+        List<Vector2> group = new List<Vector2>();
+        queue.Enqueue(pos);
+        visited.Add(pos);
+
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+            group.Add(current);
+
+            foreach (var dir in directions)
+            {
+                Vector2 neighbor = current + dir;
+                if (positions.Contains(neighbor) && !visited.Contains(neighbor))
+                {
+                    visited.Add(neighbor);
+                    queue.Enqueue(neighbor);
+                }
+            }
+        }
+
+        // Create a rectangle from the grouped positions
+        float minX = group.Min(v => v.X);
+        float minY = group.Min(v => v.Y);
+        float maxX = group.Max(v => v.X);
+        float maxY = group.Max(v => v.Y);
+
+        boundingRects.Add(new Rectangle(
+            (int)minX,
+            (int)minY,
+            (int)(maxX - minX + size),
+            (int)(maxY - minY + size)
+        ));
+    }
+
+    return boundingRects.ToArray();
+}
+
+
+            List<Rectangle> boundingRectangles = new List<Rectangle>();
+            switch (_tetID)
+            {
+                case 0:
+                    boundingRectangles.Add(new Rectangle((int)_position.X, (int)_position.Y, 2 * Square.length, 2 * Square.length));
+                    break;
+                case 1:
+                    boundingRectangles.Add(new Rectangle((int)_position.X, (int)_position.Y + Square.length, 3 * Square.length, Square.length));
+                    boundingRectangles.Add(new Rectangle((int)_position.X + Square.length, (int)_position.Y, Square.length, Square.length));
+                    break;
+                case 2:
+                    boundingRectangles.Add(new Rectangle((int)_position.X, (int)_position.Y, Square.length, 3 * Square.length));
+                    boundingRectangles.Add(new Rectangle((int)_position.X + Square.length, (int)_position.Y + 2 * Square.length, Square.length, Square.length));
+                    break;
+                case 3:
+                    boundingRectangles.Add(new Rectangle((int)_position.X + Square.length, (int)_position.Y, Square.length, 3 * Square.length));
+                    boundingRectangles.Add(new Rectangle((int)_position.X, (int)_position.Y + 2 * Square.length, Square.length, Square.length));
+                    break;
+                case 4:
+                    boundingRectangles.Add(new Rectangle((int)_position.X, (int)_position.Y, 2 * Square.length, Square.length));
+                    boundingRectangles.Add(new Rectangle((int)_position.X + Square.length, (int)_position.Y + Square.length, 2 * Square.length, Square.length));
+                    break;
+                case 5:
+                    boundingRectangles.Add(new Rectangle((int)_position.X, (int)_position.Y + Square.length, 2 * Square.length, Square.length));
+                    boundingRectangles.Add(new Rectangle((int)_position.X + Square.length, (int)_position.Y, 2 * Square.length, Square.length));
+                    break;
+                case 6:
+                    boundingRectangles.Add(new Rectangle((int)_position.X, (int)_position.Y, Square.length, 4 * Square.length));
+                    break;
+                default:
+                    break;
+            }
+            return boundingRectangles.ToArray();
